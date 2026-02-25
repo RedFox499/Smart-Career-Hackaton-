@@ -44,7 +44,6 @@ INSTALLED_APPS = [
     'ai_core',
     'career',
     'recruitment',
-    'matching',
 ]
 
 MIDDLEWARE = [
