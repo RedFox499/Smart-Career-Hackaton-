@@ -1,0 +1,17 @@
+{% if verdict %}
+<div class="modal-overlay" id="resultModal">
+    <div class="modal-content">
+        <div class="modal-header" style="background: #28a745;">
+            <h3>Результат анализа: {{ filename }}</h3>
+            <span class="close-button" onclick="document.getElementById('resultModal').style.display='none'">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="ai-response">
+                {{ verdict|linebreaks }}
+            </div>
+            <hr>
+            <a href="profile/" class="btn btn-primary">Перейти в личный кабинет</a>
+        </div>
+    </div>
+</div>
+{% endif %}

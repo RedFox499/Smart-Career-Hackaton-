@@ -1,7 +1,7 @@
 from django.db import models
 from .utils import preprocess_text
 from users.models import EmployerProfile
-
+from django.conf import settings
 
 class Vacancy(models.Model):
     """
@@ -30,6 +30,18 @@ class Vacancy(models.Model):
     class Meta:
         verbose_name = 'Вакансия'
         verbose_name_plural = 'Вакансии'
-        
+
     def __str__(self):
         return f"{self.title} - {self.employer.company_name}"
+    
+class Verdict(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='verdicts')
+    filename = models.CharField(max_length=255, verbose_name="Имя файла")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата загрузки")
+    
+    # Сюда мы будем целиком сохранять словарь, который отдает Gemini
+    ai_data = models.JSONField(verbose_name="Результат ИИ")
+
+    def __str__(self):
+        return f"Вердикт: {self.filename} ({self.user.username})"
+    

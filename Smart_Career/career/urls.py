@@ -8,6 +8,5 @@ urlpatterns = [
     path('employer/', views.employer_dashboard, name='employer_dashboard'),
     path('', index, name='index'), 
     path('profile/', profile, name='profile'),
-  
-
+    path('upload/', views.upload_resume, name='upload'),
 ]

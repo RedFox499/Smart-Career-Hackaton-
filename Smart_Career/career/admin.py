@@ -3,6 +3,7 @@ from .models import *
 
 admin.site.register(Vacancy)
 
+admin.site.register(Verdict)
 
     
 # Register your models here.

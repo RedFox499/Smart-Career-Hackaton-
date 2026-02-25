@@ -22,11 +22,12 @@
                 <li class="nav-item ">
                     <a class="nav-link text-white" aria-current="page" href="{% url 'index' %}">Главная</a>
                 </li>
-                <li class="nav-item ml-10">
-                    <a class="nav-link text-white" aria-current="page" href="#">Поиск работников</a>
-                </li>
                  <li class="nav-item ml-10">
+                    {% if user.role == 'STUDENT' %}
                     <a class="nav-link text-white" aria-current="page" href="{% url 'analyze_resume' %}">Поиск вакансий</a>
+                    {%else%}
+                    <a class="nav-link text-white" aria-current="page" href="{% url 'analyze' %}">Загрузить вакансию</a>
+                    {% endif %}
                 </li>
             </ul>
             <ul class="nav nav-underline ms-auto">
@@ -106,29 +107,51 @@
             </div>
             <div class="col-md-12 mt-5">
                 <div class="card p-4 shadow-sm mb-4 border-primary">
-                    <h4 class="card-title text-primary mb-3">Вердикт эксперта (Gemini 2.5)</h4>
-                    <p class="lead" style="font-size: 1.1em;">{{ ai.summary }}</p>
-                    
-                    <h5 class="mt-4 text-danger border-bottom pb-2">Критика и ошибки в резюме</h5>
-                    {% if ai.errors %}
-                        <ul class="list-group list-group-flush mb-3">
-                        {% for error in ai.errors %}
-                            <li class="list-group-item list-group-item-danger"><i class="fw-bold text-danger me-2">!</i> {{ error }}</li>
-                        {% endfor %}
-                        </ul>
-                    {% else %}
-                        <div class="alert alert-success">Очевидных ошибок в составлении не найдено.</div>
-                    {% endif %}
+                <form action="{% url 'upload' %}" method="POST" enctype="multipart/form-data" class="mb-4">
+                    {% csrf_token %}
+                    <input type="file" name="file" required>
+                    <button type="submit" class="btn btn-success">Проверить резюме</button>
+                </form>
 
-                    <h5 class="mt-4 text-warning border-bottom pb-2">Чего не хватает для должности</h5>
-                    <div class="mb-3">
-                        {% for skill in ai.missing_skills %}
-                            <span class="badge bg-warning text-dark me-1 mb-2 text-wrap text-start lh-base" style="font-size: 0.9em;">{{ skill }}</span>
-                        {% empty %}
-                            <span class="badge bg-success">Все необходимые навыки присутствуют</span>
-                        {% endfor %}
-            </div>
+                <hr>
 
+                {% if last_verdict %}
+                <div class="card shadow-lg border-primary mb-5">
+                    <div class="card-header bg-primary text-white">
+                        <h3>Результат анализа: {{ last_verdict.filename }}</h3>
+                    </div>
+                    <div class="card-body">
+                        {% with ai=last_verdict.ai_data %}
+                            <h4 class="card-title text-primary mb-3">Вердикт эксперта</h4>
+                            <p class="lead">{{ ai.summary }}</p>
+
+                            <h5 class="mt-4 text-danger border-bottom pb-2">Критика и ошибки</h5>
+                            <ul>
+                                {% for error in ai.errors %}
+                                    <li>{{ error }}</li>
+                                {% empty %}
+                                    <li>Ошибок не найдено</li>
+                                {% endfor %}
+                            </ul>
+
+                            <h5 class="mt-4 text-warning border-bottom pb-2">Чего не хватает</h5>
+                            {% for skill in ai.missing_skills %}
+                                <span class="badge bg-warning text-dark">{{ skill }}</span>
+                            {% endfor %}
+                        {% endwith %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <h4>История ваших проверок</h4>
+                <div class="list-group">
+                    {% for v in verdicts %}
+                        <div class="list-group-item">
+                            {{ v.filename }} — {{ v.created_at|date:"d.m.Y" }}
+                        </div>
+                    {% endfor %}
+                </div>
+                                
         </div>
     </div>
     {% else %}
@@ -204,7 +227,7 @@
                     <hr class="my-4">
 
                     <div class="d-flex justify-content-end gap-2">
-                        <a href="{% url 'analyze' %}" class="btn btn-primary">Загрузить резюме</a>
+                        <a href="{% url 'analyze' %}" class="btn btn-primary">Загрузить вакансию</a>
                         <form method="post" action="{% url 'logout' %}" >
                             {% csrf_token %}
                             <button onclick="document.getElementById('logout-form').submit(); return false;" class="btn btn-danger">Выйти</button>
