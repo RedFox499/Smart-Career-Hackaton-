@@ -3,4 +3,5 @@ from .models import Candidate
 
 @admin.register(Candidate)
 class CandidateAdmin(admin.ModelAdmin):
-    list_display = ('full_name', 'position', 'created_at')
+    # Убери created_at из этого списка
+    list_display = ('full_name', 'position')
