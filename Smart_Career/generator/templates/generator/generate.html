@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ru" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Data Generator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body { background-color: #0f172a; font-family: 'Inter', sans-serif; color: #f8fafc; }
+        .gen-card { 
+            background-color: #1e293b; 
+            border: 1px solid #334155; 
+            border-radius: 20px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5); 
+        }
+        .btn-gen {
+            background: linear-gradient(135deg, #10b981, #059669);
+            border: none;
+            padding: 15px;
+            border-radius: 12px;
+            font-weight: 800;
+            color: white;
+            transition: 0.3s;
+        }
+        .btn-gen:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(16, 185, 129, 0.4); }
+        .stat-box { background: #0f172a; border-radius: 12px; padding: 15px; border-left: 4px solid #3b82f6; }
+    </style>
+</head>
+<body class="py-5">
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
+            <div class="gen-card p-4 p-sm-5">
+                <div class="text-center mb-4">
+                    <h2 class="fw-bold text-white mb-2">Генератор Базы БД 🗄️</h2>
+                    <p class="text-secondary">Создание фейковых резюме для тестов</p>
+                </div>
+
+                <div class="stat-box mb-4 text-center">
+                    <span class="text-secondary">Всего резюме в локальной БД:</span> 
+                    <span class="fs-4 fw-bold text-info ms-2">{{ total_in_db }}</span>
+                </div>
+
+                {% if message %}
+                <div class="alert alert-success bg-success bg-opacity-10 border-success text-success fw-bold text-center rounded-3 mb-4">
+                    {{ message }}
+                </div>
+                {% endif %}
+
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <label class="form-label text-white fw-semibold">Должность / Стек:</label>
+                        <input type="text" name="topic" class="form-control form-control-lg bg-dark border-secondary text-white" 
+                               placeholder="Например: Go Backend Developer" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label text-white fw-semibold">Количество (от 1 до 50):</label>
+                        <input type="number" name="count" class="form-control form-control-lg bg-dark border-secondary text-white" 
+                               value="5" min="1" max="50" required>
+                    </div>
+                    <button type="submit" class="btn btn-gen w-100 shadow-sm">
+                        ⚡ СГЕНЕРИРОВАТЬ РЕЗЮМЕ
+                    </button>
+                </form>
+
+                <div class="mt-4 text-center">
+                    <a href="/arr/analyze/" class="text-decoration-none text-secondary small hover-info">
+                        ← Вернуться к поиску кандидатов
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

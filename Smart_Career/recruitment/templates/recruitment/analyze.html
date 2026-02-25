@@ -2,74 +2,165 @@
 <html lang="ru" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
-    <title>AI Recruitment System</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Tech Recruiter | Smart Career</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <style>
-        body { background: #0f0f12; color: #e0e0e0; font-family: 'Inter', sans-serif; }
-        .glass-card {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            transition: 0.3s;
-        }
-        .glass-card:hover { border-color: #0d6efd; }
-        .match-badge {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #00ff88;
-        }
-        pre { white-space: pre-wrap; word-wrap: break-word; }
+        body { background-color: #0f172a; color: #f8fafc; font-family: 'Inter', sans-serif; }
+        
+        /* Карточка загрузки */
+        .main-card { background-color: #1e293b; border: 1px solid #334155; border-radius: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        .drop-zone { border: 2px dashed #475569; border-radius: 16px; padding: 40px; text-align: center; cursor: pointer; background: #0f172a; transition: 0.3s; }
+        .drop-zone:hover { border-color: #6366f1; background: #172033; }
+        
+        /* Переключатель Gemini */
+        .form-switch .form-check-input { width: 3em; height: 1.5em; cursor: pointer; }
+        .gemini-active-label { color: #8b5cf6; text-shadow: 0 0 10px rgba(139, 92, 246, 0.5); }
+
+        /* Аккордеон кандидатов */
+        .accordion-item { background: #1e293b; border: 1px solid #334155; border-radius: 16px !important; margin-bottom: 20px; overflow: hidden; }
+        .accordion-button { background: #1e293b; color: white; padding: 25px; box-shadow: none !important; }
+        .accordion-button:not(.collapsed) { background: #172033; border-bottom: 1px solid #334155; }
+        .accordion-body { background: #0f172a; }
+
+        /* Элементы анализа */
+        .score-circle { width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.2rem; }
+        .report-box { background: #1e293b; border-radius: 12px; padding: 20px; border-top: 4px solid; height: 100%; }
+        .pros-box { border-top-color: #10b981; }
+        .cons-box { border-top-color: #ef4444; }
+        
+        /* Цвета статусов */
+        .bg-success-subtle { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid #10b981; }
+        .bg-warning-subtle { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid #f59e0b; }
+        .bg-danger-subtle { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid #ef4444; }
+
+        .alert-custom { background: rgba(99, 102, 241, 0.05); border: 1px solid #334155; border-left: 5px solid #6366f1; border-radius: 16px; }
     </style>
 </head>
 <body class="py-5">
-    <div class="container">
-        <h1 class="text-center mb-5 fw-bold">🚀 Smart Hire <span class="text-primary">AI</span></h1>
-        
-        <div class="row g-4">
-            <div class="col-lg-5">
-                <div class="glass-card p-4">
-                    <form method="post" enctype="multipart/form-data">
-                        {% csrf_token %}
-                        <div class="mb-3">
-                            <label class="form-label text-secondary small">Требования вакансии (или ссылка на HH)</label>
-                            <textarea name="vacancy" class="form-control" rows="4" placeholder="Введите текст вакансии..."></textarea>
-                        </div>
-                        
-                        <div class="mb-4">
-                            <label class="form-label text-secondary small">Резюме (Текст или Файл)</label>
-                            <textarea name="resume_text" class="form-control mb-2" rows="4" placeholder="Текст резюме..."></textarea>
-                            <input type="file" name="resume_file" class="form-control bg-dark border-secondary">
-                        </div>
-                        
-                        <button type="submit" class="btn btn-primary w-100 py-3 fw-bold rounded-pill">Проанализировать кандидата</button>
-                    </form>
-                </div>
-            </div>
 
-            <div class="col-lg-7">
-                {% if percentage %}
-                <div class="glass-card p-4 mb-4 text-center">
-                    <div class="small text-secondary mb-1">Соответствие кандидата</div>
-                    <div class="match-badge">{{ percentage }}%</div>
-                    <div class="progress mt-2" style="height: 5px;">
-                        <div class="progress-bar bg-success" role="progressbar" style="width: {{ percentage|default:0 }}%;"></div>
-                    </div>
+<div class="container">
+    <div class="row justify-content-center mb-5">
+        <div class="col-lg-8">
+            <div class="card main-card p-4 p-md-5">
+                <div class="text-center mb-4">
+                    <h2 class="fw-bold text-white">AI Tech Recruiter 🤖</h2>
+                    <p class="text-secondary small">Загрузите вакансию и выберите модель анализа</p>
                 </div>
 
-                <div class="glass-card p-4">
-                    <h5 class="text-primary mb-3">🔍 Подробный анализ недостатков</h5>
-                    <div class="text-light small lh-lg">
-                        {{ report|safe }}
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="form-check form-switch d-flex justify-content-center align-items-center mb-4 p-0">
+                        <span class="me-3 text-secondary small fw-bold">Локальная модель (Быстро)</span>
+                        <input class="form-check-input" type="checkbox" name="use_gemini" id="geminiSwitch">
+                        <label class="ms-3 fw-bold small gemini-active-label" for="geminiSwitch">Google Gemini (Глубоко) ✨</label>
                     </div>
-                </div>
-                {% else %}
-                <div class="h-100 d-flex align-items-center justify-content-center border border-secondary border-dashed rounded-4 p-5">
-                    <p class="text-secondary">Результаты появятся здесь после анализа</p>
-                </div>
-                {% endif %}
+
+                    <div class="mb-4">
+                        <label class="drop-zone d-block" for="fileInput">
+                            <div id="fileContent">
+                                <p id="fileText" class="m-0 text-secondary">Выбрать файл вакансии (PDF, DOCX, TXT)</p>
+                            </div>
+                            <input type="file" name="resumes" id="fileInput" class="d-none" required>
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 py-3 fw-bold fs-5 shadow-lg rounded-3">
+                        🚀 ЗАПУСТИТЬ AI-СКРИНИНГ
+                    </button>
+                </form>
             </div>
         </div>
     </div>
+
+    {% if error %}
+    <div class="row justify-content-center mb-4">
+        <div class="col-lg-8">
+            <div class="alert alert-custom p-4 text-center shadow">
+                <h5 class="fw-bold text-info mb-2">Уведомление системы</h5>
+                <p class="mb-3 text-white-50 small">{{ error }}</p>
+                <a href="/gen/" class="btn btn-outline-info btn-sm rounded-pill px-4">Добавить кандидатов в базу</a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if candidates %}
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="text-white fw-bold m-0">Топ подходящих кандидатов:</h4>
+                <span class="badge bg-dark border border-secondary p-2 rounded-pill px-3">Найдено: {{ candidates|length }}</span>
+            </div>
+
+            <div class="accordion" id="cndAcc">
+                {% for c in candidates %}
+                <div class="accordion-item shadow">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c{{ forloop.counter }}">
+                            <div class="d-flex align-items-center w-100">
+                                <div class="score-circle me-4 bg-{{ c.status_color }}-subtle">
+                                    {{ c.score }}%
+                                </div>
+                                <div>
+                                    <h5 class="fw-bold text-white mb-1">{{ c.name }}</h5>
+                                    <span class="text-secondary small">Нажмите для детального отчета</span>
+                                </div>
+                            </div>
+                        </button>
+                    </h2>
+                    
+                    <div id="c{{ forloop.counter }}" class="accordion-collapse collapse" data-bs-parent="#cndAcc">
+                        <div class="accordion-body p-4 p-md-5">
+                            
+                            <div class="mb-5">
+                                <h6 class="text-secondary text-uppercase fw-bold mb-3 small" style="letter-spacing: 1px;">Данные из базы:</h6>
+                                <div class="p-4 rounded-3 text-light" style="background: #172033; border: 1px dashed #334155; white-space: pre-wrap; font-size: 0.9rem;">{{ c.text }}</div>
+                            </div>
+
+                            <div class="row g-4 mb-4">
+                                <div class="col-md-6">
+                                    <div class="report-box pros-box">
+                                        <h6 class="text-success fw-bold mb-3">✅ Сильные стороны</h6>
+                                        <div class="small text-white-50">{{ c.pros|safe }}</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="report-box cons-box">
+                                        <h6 class="text-danger fw-bold mb-3">⚠️ Риски и минусы</h6>
+                                        <div class="small text-white-50">{{ c.cons|safe }}</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-4 p-4 rounded-4" style="background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(139,92,246,0.1)); border: 1px solid rgba(139,92,246,0.2);">
+                                <h6 class="text-info fw-bold mb-2">💡 Вердикт системы:</h6>
+                                <p class="m-0 text-white small">{{ c.conclusion|safe }}</p>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    // Обработка выбора файла
+    const fileInput = document.getElementById('fileInput');
+    const fileText = document.getElementById('fileText');
+
+    fileInput.addEventListener('change', function() {
+        if(this.files[0]) {
+            fileText.innerHTML = `<span class="text-info fw-bold">Файл выбран:</span><br><span class="text-white">${this.files[0].name}</span>`;
+        }
+    });
+</script>
+
 </body>
 </html>

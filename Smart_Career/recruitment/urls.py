@@ -1,8 +1,7 @@
-# recruitment/urls.py
 from django.urls import path
 from . import views
 
 urlpatterns = [
-    # Замени views.employer_analysis_view на views.analyze_view
+    # Возвращаем простой путь без всяких ID
     path('analyze/', views.analyze_view, name='analyze'),
 ]
