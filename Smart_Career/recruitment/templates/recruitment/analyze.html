@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ru" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <title>AI Recruitment System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background: #0f0f12; color: #e0e0e0; font-family: 'Inter', sans-serif; }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            transition: 0.3s;
+        }
+        .glass-card:hover { border-color: #0d6efd; }
+        .match-badge {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #00ff88;
+        }
+        pre { white-space: pre-wrap; word-wrap: break-word; }
+    </style>
+</head>
+<body class="py-5">
+    <div class="container">
+        <h1 class="text-center mb-5 fw-bold">🚀 Smart Hire <span class="text-primary">AI</span></h1>
+        
+        <div class="row g-4">
+            <div class="col-lg-5">
+                <div class="glass-card p-4">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label text-secondary small">Требования вакансии (или ссылка на HH)</label>
+                            <textarea name="vacancy" class="form-control" rows="4" placeholder="Введите текст вакансии..."></textarea>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label text-secondary small">Резюме (Текст или Файл)</label>
+                            <textarea name="resume_text" class="form-control mb-2" rows="4" placeholder="Текст резюме..."></textarea>
+                            <input type="file" name="resume_file" class="form-control bg-dark border-secondary">
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary w-100 py-3 fw-bold rounded-pill">Проанализировать кандидата</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-lg-7">
+                {% if percentage %}
+                <div class="glass-card p-4 mb-4 text-center">
+                    <div class="small text-secondary mb-1">Соответствие кандидата</div>
+                    <div class="match-badge">{{ percentage }}%</div>
+                    <div class="progress mt-2" style="height: 5px;">
+                        <div class="progress-bar bg-success" role="progressbar" style="width: {{ percentage|default:0 }}%;"></div>
+                    </div>
+                </div>
+
+                <div class="glass-card p-4">
+                    <h5 class="text-primary mb-3">🔍 Подробный анализ недостатков</h5>
+                    <div class="text-light small lh-lg">
+                        {{ report|safe }}
+                    </div>
+                </div>
+                {% else %}
+                <div class="h-100 d-flex align-items-center justify-content-center border border-secondary border-dashed rounded-4 p-5">
+                    <p class="text-secondary">Результаты появятся здесь после анализа</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>
