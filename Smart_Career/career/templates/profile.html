@@ -23,7 +23,7 @@
                     <a class="nav-link text-white" aria-current="page" href="{% url 'index' %}">Главная</a>
                 </li>
                 <li class="nav-item ml-10">
-                    <a class="nav-link text-white" aria-current="page" href="{% url 'analyze_resume' %}">Поиск вакансий</a>
+                    <a class="nav-link text-white" aria-current="page" href="#">Поиск вакансий</a>
                 </li>
             </ul>
             <ul class="nav nav-underline ms-auto">
@@ -92,7 +92,7 @@
                     <hr class="my-4">
 
                     <div class="d-flex justify-content-end gap-2">
-                        
+                        <a href="{% url 'analyze_resume' %}" class="btn btn-primary">Загрузить резюме</a>
                         <form action="{% url 'logout' %}" method="post">
                             {% csrf_token %}
                             <button onclick="document.getElementById('logout-form').submit(); return false;" class="btn btn-danger">Выйти</button>
@@ -129,8 +129,88 @@
         </div>
     </div>
     {% else %}
-    <h1>Vi lox</h1>
+    <div class="container py-5">
+        <div class="column justify-content-center">
+            <div class="col-md-12">
+                <div class="card profile-card p-4 bg-white">
+                    <div class="d-flex justify-content-center">
+                        {% if user.is_authenticated %}
+                        <h4>Привет, {{ user.first_name }} {{ user.last_name }}</h4>
+                         {%endif%}
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h1 class="h3 mb-0">Личный кабинет</h1>
+                    </div>
+
+                    <div class="row align-items-center">
+                        <div class="d-flex col-md-2 flex-column border-end text-center justify-content-center">
+                            <img src="https://ui-avatars.com/api/?name={{ user.username }}&background=random&size=128" 
+                                alt="avatar" class="rounded-circle mb-3">
+                            <h5>{{ user.first_name }} {{ user.last_name }}</h5>
+                            <p class="text-muted small">@{{ user.username }}</p>
+                            <hr>
+                        </div>
+
+                        <div class="col-md-4 ps-4">
+                            <h6 class="text-primary mt-2">Вакансии</h6>
+                            <select id="vacancy-select" class="form-select">
+                                <option value="">-- Выберите вакансию для просмотра --</option>
+                                {% for vacancy in user.employer_profile.vacancies.all %}
+                                    <option value="{{ vacancy.id }}" 
+                                            data-title="{{ vacancy.title }}" 
+                                            data-desc="{{ vacancy.description }}">
+                                        {{ vacancy.title }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+
+                            <div id="vacancyModal" class="modal-overlay">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h2 id="modalTitle">Название вакансии</h2>
+                                        <span class="close-button" id="closeModal">&times;</span>
+                                    </div>
+
+                                    <div class="modal-body">
+                                        <p id="modalDesc">Тут будет описание...</p>
+                                    </div>
+                                    
+                                    <div class="modal-footer">
+                                        <button type="button" id="btnSecondaryClose">Закрыть</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <h6 class="text-primary mt-4">Сайт</h6>
+                            {% if user.employer_profile.website %}
+                                <a href="{{ user.employer_profile.website }}" target="_blank" class="text-decoration-none">
+                                    <i class="bi bi-github"></i> {{ user.employer_profile.website }}
+                                </a>
+                            {% else %}
+                                <span class="text-muted small">Ссылка на сайт не указана</span>
+                            {% endif %}
+
+                            <h6 class="text-primary mt-4">Сырой текст резюме</h6>
+                            <div class="p-3 bg-light rounded shadow-sm small" style="max-height: 150px; overflow-y: auto;">
+                                {{ user.student_profile.raw_resume_text|linebreaks|default:"Текст резюме отсутствует." }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="{% url 'analyze_resume' %}" class="btn btn-primary">Загрузить резюме</a>
+                        <form method="post" action="{% url 'logout' %}" >
+                            {% csrf_token %}
+                            <button onclick="document.getElementById('logout-form').submit(); return false;" class="btn btn-danger">Выйти</button>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
     {% endif%}
+    <script src="{% static '/script.js' %}"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
     </body>
 </html>

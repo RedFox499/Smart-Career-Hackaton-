@@ -4,8 +4,10 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
-
+from django.shortcuts import redirect, get_object_or_404
 from matching.models import SkillMatchResult
+from .models import Vacancy
+from users.models import EmployerProfile
 
 def index(request):
     return render(request, 'index.html')
@@ -31,3 +33,4 @@ def student_dashboard(request):
 @login_required
 def employer_dashboard(request):
     return render(request, 'career/employer_dashboard.html')
+
