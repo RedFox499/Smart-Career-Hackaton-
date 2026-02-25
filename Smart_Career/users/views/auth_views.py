@@ -1,6 +1,7 @@
 from django.contrib.auth.views import LoginView
 from django.urls import reverse_lazy
 from users.models import User
+from django.shortcuts import redirect
 
 class StandardLoginView(LoginView):
     template_name = 'users/login.html'
