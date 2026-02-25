@@ -5,7 +5,7 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
 
-from Smart_Career.matching.models import SkillMatchResult
+from matching.models import SkillMatchResult
 
 def index(request):
     return render(request, 'index.html')
