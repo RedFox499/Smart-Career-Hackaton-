@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from .services import matcher
 from .models import AnalysisHistory  # ИСПРАВИЛИ ИМПОРТ
+from career.models import Vacancy
 
 def analyze_view(request):
     candidates = []
@@ -9,13 +10,20 @@ def analyze_view(request):
     if request.method == "POST":
         # ЛОГИКА СОХРАНЕНИЯ (срабатывает при нажатии кнопки "Сохранить")
         if 'save_results' in request.POST:
+            current_employer = request.user.employer_profile
             candidate_ids = request.POST.getlist('cand_ids')
             scores = request.POST.getlist('cand_scores')
             v_title = request.POST.get('vacancy_name', 'Анализ')
             v_text = request.POST.get('vacancy_text', 'Текст вакансии не указан')
-
+            Vacancy.objects.create(
+                    employer=current_employer,
+                    title = v_title,
+                    description = v_text,
+                    salary_range = 0
+                )
             for i in range(len(candidate_ids)):
                 c_id = candidate_ids[i]
+    
                 # Создаем запись в твоей модели AnalysisHistory
                 AnalysisHistory.objects.create(
                     employer=request.user, 

@@ -44,23 +44,27 @@ body
  
 }
 .modal-header {
-    background-color: #007bff; /* Тот самый цвет шапки (например, синий) */
+    background-color: #222222; /* Тот самый цвет шапки (например, синий) */
     color: white;              /* Цвет текста в шапке */
-
+    padding: 15px 20px !important;
     display: flex;
     justify-content: space-between !important;
     align-items: center !important;
 }
 .modal-content {
-    background-color: #222222 !important;    
+    background-color: #141414 !important;    
     border: 1px solid #ddd;    
     box-shadow: 0 10px 30px rgba(0,0,0,0.2); 
     margin: 10% auto;
-
+    color: white !important;   
     width: 70% !important;
     border-radius: 12px;
 }
-
+.modal-body
+{
+    padding-top: 15px !important    ;
+    padding-left: 20px !important   ;
+}
 @keyframes slideDown {
     from { transform: translateY(-50px); opacity: 0; }
     to { transform: translateY(0); opacity: 1; }

@@ -23,7 +23,7 @@
                     <a class="nav-link text-white" aria-current="page" href="{% url 'index' %}">Главная</a>
                 </li>
                 <li class="nav-item ml-10">
-                    <a class="nav-link text-white" aria-current="page" href="#">Поиск вакансий</a>
+                    <a class="nav-link text-white" aria-current="page" href="#">Поиск работников</a>
                 </li>
                  <li class="nav-item ml-10">
                     <a class="nav-link text-white" aria-current="page" href="{% url 'analyze_resume' %}">Поиск вакансий</a>
@@ -193,7 +193,8 @@
                                 <span class="text-muted small">Ссылка на сайт не указана</span>
                             {% endif %}
 
-                            <h6 class="text-primary mt-4">Сырой текст резюме</h6>
+                            <h6 class="text-primary mt-4">Название компании: {{ user.employer_profile.company_name}}</h6>
+                             <h6 class="text-primary mt-4">Email: {{ user.email}}</h6>
                             <div class="p-3 bg-light rounded shadow-sm small" style="max-height: 150px; overflow-y: auto;">
                                 {{ user.student_profile.raw_resume_text|linebreaks|default:"Текст резюме отсутствует." }}
                             </div>
