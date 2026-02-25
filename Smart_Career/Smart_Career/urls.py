@@ -11,8 +11,7 @@ urlpatterns = [
     path('', include('career.urls')),
     path('admin/', admin.site.urls),
     path('arr/', include('recruitment.urls')),
-    
-    # Вакансии ищутся по навыкам
+    path('gen/', include('generator.urls')),
     path('match/', include('matching.urls')),
     
 ]

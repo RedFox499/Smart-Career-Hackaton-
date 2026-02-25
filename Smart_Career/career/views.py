@@ -22,7 +22,7 @@ def profile(request):
     context = {
         'history': history,
     }
-    return render(request, 'career/profile.html', context) # Лучше хранить внутри папки приложения
+    return render(request, 'profile.html', context)
 
 @login_required
 def student_dashboard(request):

@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'career',
     'recruitment',
     'matching',
+    'generator',
 ]
 
 MIDDLEWARE = [
@@ -121,7 +122,7 @@ USE_TZ = True
 
 AUTH_USER_MODEL = 'users.User'
 LOGIN_REDIRECT_URL = '/career/'
-LOGOUT_REDIRECT_URL = ''
+LOGOUT_REDIRECT_URL = 'index'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/

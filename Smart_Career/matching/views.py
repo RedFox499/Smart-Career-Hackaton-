@@ -5,7 +5,7 @@ from .services import extract_text_from_file, auto_match_vacancies
 
 @login_required
 def student_analysis_view(request):
-    if request.user.role != 'STUDENT': # Поправь на свою проверку роли
+    if request.user.role != 'STUDENT': 
         return redirect('profile')
 
     context = {}
