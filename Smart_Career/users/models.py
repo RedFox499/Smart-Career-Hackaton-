@@ -33,7 +33,7 @@ class StudentProfile(models.Model):
     github_link = models.URLField(blank=True, max_length=255)
     raw_resume_text = models.TextField(blank=True, verbose_name='Сырой текст резюме')
     market_readiness_score = models.IntegerField(default=0, help_text='Скор готовности (от ИИ)')
-
+    
     def __str__(self):
         return f"Студент: {self.user.username}"
 

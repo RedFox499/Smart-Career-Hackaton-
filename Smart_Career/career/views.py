@@ -7,6 +7,9 @@ from django.contrib.auth.decorators import login_required
 def index(request):
     return render(request, 'index.html')
 
+def profile(request):
+    return render(request, 'profile.html')
+
 @login_required
 def student_dashboard(request):
     return render(request, 'career/student_dashboard.html')
