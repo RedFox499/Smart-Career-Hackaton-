@@ -5,14 +5,24 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
 
+from Smart_Career.matching.models import SkillMatchResult
+
 def index(request):
     return render(request, 'index.html')
 
+@login_required # Используем декоратор вместо ручной проверки if
 def profile(request):
-    if request.user.is_authenticated:
-        return render(request, 'profile.html')
-    else:
-        return redirect('index')
+    # Получаем историю анализов этого студента
+    history = []
+    if hasattr(request.user, 'student_profile'):
+        history = SkillMatchResult.objects.filter(
+            student=request.user.student_profile
+        ).order_by('created_at')
+
+    context = {
+        'history': history,
+    }
+    return render(request, 'career/profile.html', context) # Лучше хранить внутри папки приложения
 
 @login_required
 def student_dashboard(request):
