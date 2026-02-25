@@ -8,4 +8,6 @@ def chat_view(request):
     
     return JsonResponse({'response': ai_response})
 
+def index(request):
+    return render(request, 'index.html')
 # Create your views here.
