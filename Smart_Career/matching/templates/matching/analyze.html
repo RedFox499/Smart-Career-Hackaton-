@@ -2,96 +2,151 @@
 <html lang="ru" class="h-full bg-slate-950">
 <head>
     <meta charset="UTF-8">
-    <title>Анализ резюме | ИИ</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Умный подбор вакансий | SkillMatch AI</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .glass-card {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(51, 65, 85, 0.5);
+        }
+    </style>
 </head>
-<body class="text-slate-200 p-10 max-w-5xl mx-auto">
+<body class="text-slate-200 min-h-screen pb-20">
 
-    <div class="flex justify-between items-center mb-8">
-        <h1 class="text-3xl font-bold text-blue-400">SkillMatch AI</h1>
-        <a href="{% url 'profile' %}" class="text-slate-400 hover:text-white">← В профиль</a>
-    </div>
+    <nav class="max-w-6xl mx-auto px-6 py-8 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-900/20">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+            </div>
+            <h1 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">
+                SkillMatch <span class="text-blue-500 text-sm tracking-widest uppercase ml-1">AI</span>
+            </h1>
+        </div>
+        <a href="{% url 'profile' %}" class="flex items-center gap-2 text-slate-400 hover:text-white transition-all group">
+            <span class="text-sm font-medium">Вернуться в профиль</span>
+            <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+        </a>
+    </nav>
 
-    {% if error %}
-        <div class="bg-red-900/50 border border-red-500 text-red-200 p-4 rounded-lg mb-6">{{ error }}</div>
+    <main class="max-w-6xl mx-auto px-6">
+        
+        <div class="glass-card rounded-3xl p-8 md:p-12 mb-12 shadow-2xl">
+            <div class="max-w-2xl">
+                <h2 class="text-3xl font-bold text-white mb-2">Найдите работу мечты по навыкам</h2>
+                <p class="text-slate-400 mb-8">Загрузите резюме в PDF или вставьте текст. Наш ИИ проанализирует ваши компетенции и подберет вакансии из базы за секунды.</p>
+                
+                <form method="POST" enctype="multipart/form-data" class="space-y-6">
+                    {% csrf_token %}
+                    
+                    <div class="relative group">
+                        <label class="block text-sm font-medium text-slate-400 mb-3">Ваше резюме (PDF, DOCX)</label>
+                        <div class="flex items-center justify-center w-full">
+                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-slate-700 border-dashed rounded-2xl cursor-pointer bg-slate-900/50 group-hover:border-blue-500/50 transition-all">
+                                <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                    <svg class="w-8 h-8 mb-3 text-slate-500 group-hover:text-blue-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                                    <p class="text-sm text-slate-500 group-hover:text-slate-300">Перетащите файл или <span class="text-blue-500 font-semibold">выберите на диске</span></p>
+                                </div>
+                                <input type="file" name="resume_file" class="hidden" accept=".pdf,.docx" />
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-4 py-2">
+                        <div class="h-px bg-slate-800 flex-grow"></div>
+                        <span class="text-[10px] font-bold text-slate-600 uppercase tracking-widest">или вставьте текст</span>
+                        <div class="h-px bg-slate-800 flex-grow"></div>
+                    </div>
+
+                    <textarea name="resume_text" rows="4" 
+                        class="w-full p-4 bg-slate-950 border border-slate-800 rounded-2xl text-slate-200 focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all placeholder:text-slate-700"
+                        placeholder="Просто скопируйте сюда содержимое резюме..."></textarea>
+
+                    <button type="submit" class="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-2xl shadow-lg shadow-blue-900/20 transform active:scale-[0.98] transition-all">
+                        Запустить AI-подбор вакансий
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        {% if analyzed %}
+            <div id="results" class="space-y-8">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-2xl font-bold text-white">Рекомендовано специально для вас</h2>
+                    <span class="text-sm text-slate-500">Найдено вариантов: {{ recommendations|length }}</span>
+                </div>
+
+                <div class="grid grid-cols-1 gap-4">
+                    {% for item in recommendations %}
+                    <div class="glass-card p-6 md:p-8 rounded-3xl flex flex-col md:flex-row justify-between gap-6 hover:border-blue-500/50 group transition-all duration-300">
+                        <div class="flex-grow">
+                            <div class="flex items-start gap-4 mb-4">
+                                <div class="w-12 h-12 bg-slate-800 rounded-xl flex items-center justify-center text-xl font-bold text-slate-500">
+                                    {{ item.vacancy.employer.company_name|slice:":1" }}
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-bold text-white group-hover:text-blue-400 transition-colors">{{ item.vacancy.title }}</h3>
+                                    <p class="text-slate-400">{{ item.vacancy.employer.company_name }}</p>
+                                </div>
+                            </div>
+
+                            <div class="space-y-3">
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="text-[10px] text-slate-500 uppercase font-bold tracking-tighter mr-2 py-1">Вы владеете:</span>
+                                    {% for skill in item.matched_skills %}
+                                        <span class="px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-lg text-xs font-medium">
+                                            {{ skill }}
+                                        </span>
+                                    {% endfor %}
+                                </div>
+                                
+                                {% if item.missing_skills %}
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="text-[10px] text-slate-500 uppercase font-bold tracking-tighter mr-2 py-1">Нужно изучить:</span>
+                                    {% for skill in item.missing_skills %}
+                                        <span class="px-3 py-1 bg-red-500/10 text-red-400 border border-red-500/20 rounded-lg text-xs font-medium">
+                                            {{ skill }}
+                                        </span>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col justify-between items-end min-w-[120px]">
+                            <div class="text-right">
+                                <div class="text-4xl font-black text-blue-500">{{ item.score }}%</div>
+                                <div class="text-[10px] text-slate-500 uppercase font-bold tracking-widest mt-1">Match Score</div>
+                            </div>
+                            <button class="px-6 py-2 bg-slate-800 hover:bg-white hover:text-black text-white text-sm font-bold rounded-xl transition-all">
+                                Подробнее
+                            </button>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-20 bg-slate-900/30 rounded-3xl border border-slate-800">
+                        <p class="text-slate-500 italic text-lg">К сожалению, подходящих вакансий в базе пока нет.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% else %}
+            <div class="flex flex-col items-center justify-center py-20 opacity-30">
+                <svg class="w-20 h-20 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                <p class="text-xl">Отправьте данные, чтобы запустить поиск</p>
+            </div>
+        {% endif %}
+
+    </main>
+
+    {% if analyzed %}
+    <script>
+        document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+    </script>
     {% endif %}
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl">
-            <h2 class="text-xl font-semibold mb-4">Новый анализ</h2>
-            <form method="POST" class="space-y-4">
-                {% csrf_token %}
-                
-                <div>
-                    <label class="block text-sm text-slate-400 mb-1">Выберите вакансию</label>
-                    <select name="vacancy_id" required class="w-full p-3 bg-slate-950 border border-slate-700 rounded-lg text-white focus:border-blue-500 focus:outline-none">
-                        <option value="">-- Список вакансий --</option>
-                        {% for vac in vacancies %}
-                            <option value="{{ vac.id }}">{{ vac.title }} ({{ vac.employer.company_name }})</option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <div>
-                    <label class="block text-sm text-slate-400 mb-1">Текст вашего резюме</label>
-                    <textarea name="resume_text" rows="8" required placeholder="Скопируйте сюда свой опыт работы и навыки..." class="w-full p-3 bg-slate-950 border border-slate-700 rounded-lg text-white focus:border-blue-500 focus:outline-none"></textarea>
-                </div>
-
-                <button type="submit" class="w-full py-3 bg-blue-600 hover:bg-blue-500 rounded-lg font-medium transition-colors">
-                    Проанализировать через Gemini
-                </button>
-            </form>
-        </div>
-
-        <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl">
-            {% if result %}
-                <h2 class="text-xl font-semibold mb-4 text-white">Результат совпадения</h2>
-                
-                <div class="mb-6">
-                    <div class="flex justify-between mb-1">
-                        <span class="text-sm font-medium text-slate-400">Соответствие требованиям</span>
-                        <span class="text-sm font-bold text-blue-400">{{ result.match_percentage }}%</span>
-                    </div>
-                    <div class="w-full bg-slate-800 rounded-full h-4">
-                        <div class="bg-blue-500 h-4 rounded-full" style="width: {{ result.match_percentage }}%"></div>
-                    </div>
-                </div>
-
-                <div class="space-y-4">
-                    <div>
-                        <h3 class="text-sm text-slate-400 mb-2">У вас есть ({{ result.has_skills|length }}):</h3>
-                        <div class="flex flex-wrap gap-2">
-                            {% for skill in result.has_skills %}
-                                <span class="px-3 py-1 bg-emerald-900/30 text-emerald-400 border border-emerald-800 rounded-full text-xs">{{ skill }}</span>
-                            {% empty %}
-                                <span class="text-sm text-slate-500">Нет совпадений</span>
-                            {% endfor %}
-                        </div>
-                    </div>
-
-                    <div>
-                        <h3 class="text-sm text-slate-400 mb-2">Нужно подтянуть ({{ result.missing_skills|length }}):</h3>
-                        <div class="flex flex-wrap gap-2">
-                            {% for skill in result.missing_skills %}
-                                <span class="px-3 py-1 bg-red-900/30 text-red-400 border border-red-800 rounded-full text-xs">{{ skill }}</span>
-                            {% empty %}
-                                <span class="text-sm text-emerald-500">Вы идеальный кандидат!</span>
-                            {% endfor %}
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mt-6 p-4 bg-blue-900/20 border border-blue-800/50 rounded-lg">
-                    <h3 class="text-sm font-semibold text-blue-400 mb-2">💡 Совет от ИИ:</h3>
-                    <p class="text-sm text-slate-300 leading-relaxed">{{ result.ai_recommendation }}</p>
-                </div>
-            {% else %}
-                <div class="h-full flex flex-col items-center justify-center text-slate-500 space-y-4">
-                    <svg class="w-16 h-16 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                    <p>Отправьте резюме, чтобы увидеть GAP-анализ</p>
-                </div>
-            {% endif %}
-        </div>
-    </div>
 </body>
 </html>

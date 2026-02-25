@@ -1,43 +1,62 @@
 import os
 import json
+import PyPDF2
+import docx
 import google.generativeai as genai
 from django.conf import settings
-from dotenv import load_dotenv
 
-load_dotenv()
-
-# Настраиваем Gemini
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 model = genai.GenerativeModel('gemini-1.5-flash')
 
-def extract_skills_json(text):
-    prompt = f"""
-    Проанализируй текст и выпиши ИТ-навыки.
-    Верни ответ СТРОГО в формате JSON-массива строк.
-    {text}
-    """
+def extract_text_from_file(file):
+    """Извлекает текст из PDF или DOCX."""
+    ext = os.path.splitext(file.name)[1].lower()
+    text = ""
+    try:
+        if ext == '.pdf':
+            reader = PyPDF2.PdfReader(file)
+            for page in reader.pages:
+                text += page.extract_text()
+        elif ext == '.docx':
+            doc = docx.Document(file)
+            text = " ".join([p.text for p in doc.paragraphs])
+        else:
+            text = file.read().decode('utf-8')
+    except Exception as e:
+        print(f"Ошибка чтения файла: {e}")
+    return text
+
+def get_skills(text):
+    """Вытаскивает навыки через ИИ."""
+    prompt = f"Извлеки из текста все ИТ-технологии и навыки. Верни СТРОГО JSON список строк. Текст: {text}"
     try:
         response = model.generate_content(prompt)
-        # Очистка от markdown если он есть
-        text_data = response.text.replace('```json', '').replace('```', '').strip()
-        return json.loads(text_data)
+        clean_json = response.text.replace('```json', '').replace('```', '').strip()
+        return set(json.loads(clean_json))
     except:
-        return []
+        return set()
 
-def calculate_match(resume_text, vacancy_text):
-    candidate_skills = set(extract_skills_json(resume_text))
-    required_skills = set(extract_skills_json(vacancy_text))
-    
-    if not required_skills:
-        return 0, list(candidate_skills), [], "В вакансии не найдены навыки."
+def auto_match_vacancies(resume_text, vacancies_qs):
+    """Ищет лучшие вакансии для данного текста резюме."""
+    resume_skills = get_skills(resume_text)
+    recommendations = []
+
+    for vacancy in vacancies_qs:
+        # Для каждой вакансии вытаскиваем навыки (в идеале их надо хранить в базе заранее)
+        vacancy_skills = get_skills(vacancy.description)
         
-    matched = candidate_skills.intersection(required_skills)
-    missing = required_skills.difference(candidate_skills)
+        if not vacancy_skills: continue
+        
+        matched = resume_skills.intersection(vacancy_skills)
+        score = int((len(matched) / len(vacancy_skills)) * 100)
+        
+        if score > 10: # Показываем только если есть хоть какое-то совпадение
+            recommendations.append({
+                'vacancy': vacancy,
+                'score': score,
+                'matched_skills': list(matched),
+                'missing_skills': list(vacancy_skills.difference(resume_skills))
+            })
     
-    match_percentage = int((len(matched) / len(required_skills)) * 100)
-    
-    # Промпт для совета
-    prompt = f"Студенту не хватает: {', '.join(missing)}. Дай план обучения из 2 предложений."
-    recommendation = model.generate_content(prompt).text
-
-    return match_percentage, list(matched), list(missing), recommendation
+    # Сортируем: самые подходящие вверху
+    return sorted(recommendations, key=lambda x: x['score'], reverse=True)

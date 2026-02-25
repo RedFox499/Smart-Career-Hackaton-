@@ -1,47 +1,30 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from users.models import User
-from career.models import Vacancy # Берем вакансии из приложения career
-from .models import SkillMatchResult
-from .services import calculate_match
+from career.models import Vacancy
+from .services import extract_text_from_file, auto_match_vacancies
 
 @login_required
 def student_analysis_view(request):
-    # Защита: пускаем только студентов
-    if request.user.role != User.Role.STUDENT:
-        return redirect('employer_dashboard')
+    if request.user.role != 'STUDENT': # Поправь на свою проверку роли
+        return redirect('profile')
 
-    # Достаем все активные вакансии для выпадающего списка
-    vacancies = Vacancy.objects.filter(is_active=True)
-    context = {'vacancies': vacancies}
-
+    context = {}
+    
     if request.method == 'POST':
-        vacancy_id = request.POST.get('vacancy_id')
+        resume_file = request.FILES.get('resume_file')
         resume_text = request.POST.get('resume_text')
 
-        if not vacancy_id or not resume_text:
-            context['error'] = "Выберите вакансию и вставьте текст резюме."
-            return render(request, 'matching/analyze.html', context)
-
-        vacancy = get_object_or_404(Vacancy, id=vacancy_id)
-
-        # Вызываем наш ИИ-движок
-        percentage, matched, missing, rec = calculate_match(
-            resume_text=resume_text, 
-            vacancy_text=vacancy.description
-        )
-
-        # Сохраняем слепок в базу (для "Кривой развития")
-        result = SkillMatchResult.objects.create(
-            student=request.user.student_profile,
-            vacancy=vacancy,
-            match_percentage=percentage,
-            has_skills=matched,
-            missing_skills=missing,
-            ai_recommendation=rec
-        )
-
-        context['result'] = result
+        # Если загружен файл — приоритет ему
+        if resume_file:
+            resume_text = extract_text_from_file(resume_file)
+        
+        if resume_text:
+            active_vacancies = Vacancy.objects.filter(is_active=True)
+            # Запускаем автоподбор
+            recommendations = auto_match_vacancies(resume_text, active_vacancies)
+            context['recommendations'] = recommendations
+            context['analyzed'] = True
+        else:
+            context['error'] = "Загрузите файл или вставьте текст резюме."
 
     return render(request, 'matching/analyze.html', context)
