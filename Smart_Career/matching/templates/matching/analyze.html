@@ -1,156 +1,139 @@
 <!DOCTYPE html>
-<html lang="ru" class="h-full bg-slate-950">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Умный подбор вакансий | SkillMatch AI</title>
+    <title>Smart Career | AI Matcher</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        body { background-color: #0f172a; color: #f8fafc; }
         .glass-card {
-            background: rgba(15, 23, 42, 0.8);
+            background: rgba(30, 41, 59, 0.7);
             backdrop-filter: blur(12px);
-            border: 1px solid rgba(51, 65, 85, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
     </style>
 </head>
-<body class="text-slate-200 min-h-screen pb-20">
-
-    <nav class="max-w-6xl mx-auto px-6 py-8 flex justify-between items-center">
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-900/20">
-                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-            </div>
-            <h1 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">
-                SkillMatch <span class="text-blue-500 text-sm tracking-widest uppercase ml-1">AI</span>
-            </h1>
-        </div>
-        <a href="{% url 'profile' %}" class="flex items-center gap-2 text-slate-400 hover:text-white transition-all group">
-            <span class="text-sm font-medium">Вернуться в профиль</span>
-            <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
-        </a>
-    </nav>
-
-    <main class="max-w-6xl mx-auto px-6">
+<body class="min-h-screen p-6 md:p-12">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-8 text-blue-400">AI Анализ и подбор карьеры</h1>
         
-        <div class="glass-card rounded-3xl p-8 md:p-12 mb-12 shadow-2xl">
-            <div class="max-w-2xl">
-                <h2 class="text-3xl font-bold text-white mb-2">Найдите работу мечты по навыкам</h2>
-                <p class="text-slate-400 mb-8">Загрузите резюме в PDF или вставьте текст. Наш ИИ проанализирует ваши компетенции и подберет вакансии из базы за секунды.</p>
-                
-                <form method="POST" enctype="multipart/form-data" class="space-y-6">
-                    {% csrf_token %}
-                    
-                    <div class="relative group">
-                        <label class="block text-sm font-medium text-slate-400 mb-3">Ваше резюме (PDF, DOCX)</label>
-                        <div class="flex items-center justify-center w-full">
-                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-slate-700 border-dashed rounded-2xl cursor-pointer bg-slate-900/50 group-hover:border-blue-500/50 transition-all">
-                                <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                                    <svg class="w-8 h-8 mb-3 text-slate-500 group-hover:text-blue-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
-                                    <p class="text-sm text-slate-500 group-hover:text-slate-300">Перетащите файл или <span class="text-blue-500 font-semibold">выберите на диске</span></p>
-                                </div>
-                                <input type="file" name="resume_file" class="hidden" accept=".pdf,.docx" />
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="flex items-center gap-4 py-2">
-                        <div class="h-px bg-slate-800 flex-grow"></div>
-                        <span class="text-[10px] font-bold text-slate-600 uppercase tracking-widest">или вставьте текст</span>
-                        <div class="h-px bg-slate-800 flex-grow"></div>
-                    </div>
-
-                    <textarea name="resume_text" rows="4" 
-                        class="w-full p-4 bg-slate-950 border border-slate-800 rounded-2xl text-slate-200 focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all placeholder:text-slate-700"
-                        placeholder="Просто скопируйте сюда содержимое резюме..."></textarea>
-
-                    <button type="submit" class="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-2xl shadow-lg shadow-blue-900/20 transform active:scale-[0.98] transition-all">
-                        Запустить AI-подбор вакансий
-                    </button>
-                </form>
+        <form method="POST" enctype="multipart/form-data" class="glass-card p-8 rounded-3xl mb-12 shadow-2xl">
+            {% csrf_token %}
+            
+            <div class="mb-6">
+                <label class="block text-slate-400 mb-2 font-medium">Загрузить резюме (PDF, DOCX):</label>
+                <input type="file" name="resume_file" accept=".pdf,.docx" 
+                    class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-500 transition-all cursor-pointer">
             </div>
-        </div>
 
-{% if analyzed %}
-    <div id="results" class="space-y-8">
-        <div class="flex items-center justify-between">
-            <h2 class="text-2xl font-bold text-white">Рекомендовано специально для вас</h2>
-            <div class="flex gap-4 items-center">
-                <span class="text-sm text-slate-500">Найдено вариантов: {{ recommendations|length }}</span>
-                
-                <form method="POST">
-                    {% csrf_token %}
-                    <input type="hidden" name="save_results" value="1">
-                    {% for item in recommendations %}
-                        <input type="hidden" name="vacancy_ids" value="{{ item.vacancy.id }}">
-                        <input type="hidden" name="scores" value="{{ item.score }}">
-                        <input type="hidden" name="matched_{{ item.vacancy.id }}" value="{{ item.matched_skills|join:', ' }}">
-                    {% endfor %}
-                    <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl transition-all shadow-lg shadow-emerald-900/20">
-                        💾 Сохранить подборку
-                    </button>
-                </form>
+            <div class="flex items-center gap-4 mb-6 text-slate-500 text-xs font-bold uppercase">
+                <div class="flex-1 border-t border-slate-800"></div>
+                <span>ИЛИ</span>
+                <div class="flex-1 border-t border-slate-800"></div>
             </div>
-        </div>
 
-        <div class="grid grid-cols-1 gap-4">
+            <textarea name="resume_text" rows="5" 
+                class="w-full bg-slate-900 border border-slate-700 rounded-2xl p-4 text-slate-200 focus:ring-2 focus:ring-blue-500 outline-none transition mb-6"
+                placeholder="Вставьте текст резюме здесь..."></textarea>
+            
+            <button type="submit" class="w-full py-4 bg-blue-600 hover:bg-blue-500 rounded-2xl font-bold shadow-lg transition-transform active:scale-95">
+                Проанализировать
+            </button>
+        </form>
+
+        {% if analyzed %}
+        <div class="space-y-6">
             {% for item in recommendations %}
-            <div class="glass-card p-6 md:p-8 rounded-3xl flex flex-col md:flex-row justify-between gap-6 hover:border-blue-500/50 group transition-all duration-300">
-                <div class="flex-grow">
-                    <div class="flex items-start gap-4 mb-4">
-                        <div class="w-12 h-12 bg-slate-800 rounded-xl flex items-center justify-center text-xl font-bold text-slate-500">
-                            {{ item.vacancy.employer.company_name|slice:":1" }}
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-bold text-white group-hover:text-blue-400 transition-colors">{{ item.vacancy.title }}</h3>
-                            <p class="text-slate-400">{{ item.vacancy.employer.company_name }}</p>
-                        </div>
+            <div class="glass-card p-8 rounded-3xl flex justify-between items-center transition hover:border-blue-500/50">
+                <div class="flex-1">
+                    <h3 class="text-2xl font-bold mb-2">{{ item.vacancy.title }}</h3>
+                    <p class="text-slate-400 text-sm mb-6 line-clamp-2 italic">"{{ item.reason }}"</p>
+                    
+                    <div class="flex gap-4">
+                        <button onclick="openVacancy('{{ item.vacancy.title|escapejs }}', '{{ item.vacancy.description|escapejs }}')" 
+                            class="px-6 py-2 bg-slate-800 hover:bg-slate-700 rounded-xl text-sm font-semibold transition">
+                            Описание
+                        </button>
+                        <button onclick="openRoadmap('{{ item.vacancy.title|escapejs }}', this.getAttribute('data-roadmap'))" 
+                            data-roadmap='{{ item.roadmap_json|safe }}'
+                            class="px-6 py-2 bg-emerald-600/10 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-600/20 rounded-xl text-sm font-semibold transition">
+                            План обучения
+                        </button>
                     </div>
-
-                    <div class="space-y-3">
-                        <div class="flex flex-wrap gap-2">
-                            <span class="text-[10px] text-slate-500 uppercase font-bold tracking-tighter mr-2 py-1">Вы владеете:</span>
-                            {% for skill in item.matched_skills %}
-                                <span class="px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-lg text-xs font-medium">
-                                    {{ skill }}
-                                </span>
-                            {% endfor %}
-                        </div>
-                        </div>
                 </div>
-
-                <div class="flex flex-col justify-between items-end min-w-[120px]">
-                    <div class="text-right">
-                        <div class="text-4xl font-black text-blue-500">{{ item.score }}%</div>
-                        <div class="text-[10px] text-slate-500 uppercase font-bold tracking-widest mt-1">Match Score</div>
-                    </div>
-                    <a href="#" class="px-6 py-2 bg-slate-800 hover:bg-white hover:text-black text-white text-sm font-bold rounded-xl transition-all">
-                        Подробнее
-                    </a>
-                </div>
-            </div>
-            {% empty %}
-            <div class="text-center py-20 bg-slate-900/30 rounded-3xl border border-slate-800">
-                <p class="text-slate-500 italic text-lg">К сожалению, подходящих вакансий в базе пока нет.</p>
+                <div class="text-5xl font-black text-blue-500 ml-8">{{ item.score }}%</div>
             </div>
             {% endfor %}
         </div>
-    </div>
-{% endif %}
-            <div class="flex flex-col items-center justify-center py-20 opacity-30">
-                <svg class="w-20 h-20 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                <p class="text-xl">Отправьте данные, чтобы запустить поиск</p>
-            </div>
         {% endif %}
+    </div>
 
-    </main>
+    <div id="vModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-700 w-full max-w-2xl rounded-3xl p-8 max-h-[80vh] overflow-y-auto">
+            <h2 id="vTitle" class="text-2xl font-bold text-blue-400 mb-6"></h2>
+            <div id="vBody" class="text-slate-300 whitespace-pre-wrap leading-relaxed"></div>
+            <button onclick="closeModal('vModal')" class="mt-8 w-full py-3 bg-slate-800 rounded-xl font-bold">Закрыть</button>
+        </div>
+    </div>
 
-    {% if analyzed %}
+    <div id="rModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-950 border border-emerald-500/30 w-full max-w-4xl rounded-[2.5rem] p-10 max-h-[85vh] overflow-y-auto">
+            <h2 class="text-3xl font-bold text-emerald-400 mb-8">🚀 Рекомендуемый путь развития</h2>
+            <div id="rContent" class="grid grid-cols-1 gap-6"></div>
+            <button onclick="closeModal('rModal')" class="mt-10 w-full py-4 bg-emerald-600 rounded-2xl font-bold">Закрыть</button>
+        </div>
+    </div>
+
     <script>
-        document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
-    </script>
-    {% endif %}
+        function openVacancy(t, b) {
+            document.getElementById('vTitle').innerText = t;
+            document.getElementById('vBody').innerText = b;
+            document.getElementById('vModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
 
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        function openRoadmap(title, rawData) {
+            try {
+                const data = JSON.parse(rawData);
+                const cont = document.getElementById('rContent');
+                cont.innerHTML = '';
+                
+                if (!data || data.length === 0) {
+                    cont.innerHTML = '<p class="text-slate-500 text-center py-10">ИИ пока не сформировал план обучения для этой вакансии.</p>';
+                } else {
+                    data.forEach(step => {
+                        cont.innerHTML += `
+                            <div class="bg-slate-900/50 p-6 rounded-3xl border border-slate-800">
+                                <h3 class="text-xl font-bold text-white mb-4">${step.skill}</h3>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div class="bg-blue-500/5 p-4 rounded-2xl border border-blue-500/10">
+                                        <span class="text-[10px] uppercase text-blue-500 font-bold block mb-1">Статья</span>
+                                        <p class="text-xs text-blue-200">${step.article}</p>
+                                    </div>
+                                    <div class="bg-red-500/5 p-4 rounded-2xl border border-red-500/10">
+                                        <span class="text-[10px] uppercase text-red-500 font-bold block mb-1">Видео</span>
+                                        <p class="text-xs text-red-200">${step.video}</p>
+                                    </div>
+                                    <div class="bg-emerald-500/5 p-4 rounded-2xl border border-emerald-500/10">
+                                        <span class="text-[10px] uppercase text-emerald-500 font-bold block mb-1">Курс</span>
+                                        <p class="text-xs text-emerald-200">${step.course}</p>
+                                    </div>
+                                </div>
+                            </div>`;
+                    });
+                }
+                document.getElementById('rModal').classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            } catch (e) {
+                console.error("Ошибка:", e);
+                alert("Ошибка при загрузке плана обучения.");
+            }
+        }
+    </script>
 </body>
 </html>
