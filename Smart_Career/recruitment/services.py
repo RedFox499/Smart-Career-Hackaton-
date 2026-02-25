@@ -101,7 +101,7 @@ class SmartRecruiter:
             """
 
             try:
-                res = self.client.models.generate_content(model="gemini-1.5-flash", contents=prompt)
+                res = self.client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
                 clean_json = re.sub(r'```json|```', '', res.text).strip()
                 ai_results = json.loads(clean_json)
                 
