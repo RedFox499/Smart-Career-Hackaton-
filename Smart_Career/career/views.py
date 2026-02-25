@@ -3,12 +3,16 @@ from django.http import JsonResponse
 #from .services import ask_gemini
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect
 
 def index(request):
     return render(request, 'index.html')
 
 def profile(request):
-    return render(request, 'profile.html')
+    if request.user.is_authenticated:
+        return render(request, 'profile.html')
+    else:
+        return redirect('index')
 
 @login_required
 def student_dashboard(request):

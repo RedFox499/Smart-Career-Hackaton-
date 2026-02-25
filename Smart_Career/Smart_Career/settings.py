@@ -118,7 +118,7 @@ USE_TZ = True
 
 AUTH_USER_MODEL = 'users.User'
 LOGIN_REDIRECT_URL = '/career/'
-LOGOUT_REDIRECT_URL = 'login'
+LOGOUT_REDIRECT_URL = ''
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/

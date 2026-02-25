@@ -7,7 +7,8 @@ class StandardLoginView(LoginView):
     
     def get_success_url(self):
         user = self.request.user
+        return reverse_lazy('profile')
         # Распределяем потоки в зависимости от роли
-        if user.role == User.Role.EMPLOYER:
-            return reverse_lazy('employer_dashboard')
-        return reverse_lazy('student_dashboard')
+        #if user.role == User.Role.EMPLOYER:
+            #return reverse_lazy('employer_dashboard')
+       # return reverse_lazy('student_dashboard')

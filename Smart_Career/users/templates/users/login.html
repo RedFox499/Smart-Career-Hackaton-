@@ -2,10 +2,12 @@
     <div class="p-4 bg-green-500 text-white rounded mb-4">
         Ты уже вошел как: {{ user.username }} ({{ user.get_role_display }})
         <br>
-        <a href="{% url 'logout' %}" class="underline italic text-sm">Выйти из системы</a>
+        <a href="#" onclick="document.getElementById('logout-form').submit(); return false;" class="underline italic text-sm">Выйти из системы</a>
     </div>
 {% endif %}
-
+ <form id="logout-form" action="{% url 'logout' %}" method="post" style="display:none;">
+    {% csrf_token %}
+    </form>
 <!DOCTYPE html>
 <html lang="ru" class="h-full bg-slate-950">
 <head>
