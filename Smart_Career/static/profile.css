@@ -23,3 +23,53 @@ body
     font-size: 1.15rem;
 
 }
+.btn-primary
+{
+    --bs-btn-bg: #55ec96 !important;
+    --bs-btn-border-color: #55ec96 !important;
+    --bs-btn-hover-bg: #44b173 !important;
+    --bs-btn-border-color: #44b173 !important;
+    --bs-btn-hover-border-color: #44b173 !important;
+}
+
+.modal-overlay {
+    display: none; 
+    position: fixed;
+    z-index: 1;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    background-color: transparent;
+    backdrop-filter: blur(5px);  
+    pointer-events: auto;
+ 
+}
+.modal-header {
+    background-color: #007bff; /* Тот самый цвет шапки (например, синий) */
+    color: white;              /* Цвет текста в шапке */
+
+    display: flex;
+    justify-content: space-between !important;
+    align-items: center !important;
+}
+.modal-content {
+    background-color: #222222 !important;    
+    border: 1px solid #ddd;    
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2); 
+    margin: 10% auto;
+
+    width: 70% !important;
+    border-radius: 12px;
+}
+
+@keyframes slideDown {
+    from { transform: translateY(-50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.close-button {
+    position: absolute;
+    top: 3px; right: 20px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+}
