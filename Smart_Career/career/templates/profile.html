@@ -203,7 +203,7 @@
                     <hr class="my-4">
 
                     <div class="d-flex justify-content-end gap-2">
-                        <a href="{% url 'analyze_resume' %}" class="btn btn-primary">Загрузить резюме</a>
+                        <a href="{% url 'analyze' %}" class="btn btn-primary">Загрузить резюме</a>
                         <form method="post" action="{% url 'logout' %}" >
                             {% csrf_token %}
                             <button onclick="document.getElementById('logout-form').submit(); return false;" class="btn btn-danger">Выйти</button>
