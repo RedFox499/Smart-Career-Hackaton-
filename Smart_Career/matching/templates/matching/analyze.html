@@ -72,68 +72,72 @@
             </div>
         </div>
 
-        {% if analyzed %}
-            <div id="results" class="space-y-8">
-                <div class="flex items-center justify-between">
-                    <h2 class="text-2xl font-bold text-white">Рекомендовано специально для вас</h2>
-                    <span class="text-sm text-slate-500">Найдено вариантов: {{ recommendations|length }}</span>
+{% if analyzed %}
+    <div id="results" class="space-y-8">
+        <div class="flex items-center justify-between">
+            <h2 class="text-2xl font-bold text-white">Рекомендовано специально для вас</h2>
+            <div class="flex gap-4 items-center">
+                <span class="text-sm text-slate-500">Найдено вариантов: {{ recommendations|length }}</span>
+                
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="save_results" value="1">
+                    {% for item in recommendations %}
+                        <input type="hidden" name="vacancy_ids" value="{{ item.vacancy.id }}">
+                        <input type="hidden" name="scores" value="{{ item.score }}">
+                        <input type="hidden" name="matched_{{ item.vacancy.id }}" value="{{ item.matched_skills|join:', ' }}">
+                    {% endfor %}
+                    <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl transition-all shadow-lg shadow-emerald-900/20">
+                        💾 Сохранить подборку
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 gap-4">
+            {% for item in recommendations %}
+            <div class="glass-card p-6 md:p-8 rounded-3xl flex flex-col md:flex-row justify-between gap-6 hover:border-blue-500/50 group transition-all duration-300">
+                <div class="flex-grow">
+                    <div class="flex items-start gap-4 mb-4">
+                        <div class="w-12 h-12 bg-slate-800 rounded-xl flex items-center justify-center text-xl font-bold text-slate-500">
+                            {{ item.vacancy.employer.company_name|slice:":1" }}
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-white group-hover:text-blue-400 transition-colors">{{ item.vacancy.title }}</h3>
+                            <p class="text-slate-400">{{ item.vacancy.employer.company_name }}</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3">
+                        <div class="flex flex-wrap gap-2">
+                            <span class="text-[10px] text-slate-500 uppercase font-bold tracking-tighter mr-2 py-1">Вы владеете:</span>
+                            {% for skill in item.matched_skills %}
+                                <span class="px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-lg text-xs font-medium">
+                                    {{ skill }}
+                                </span>
+                            {% endfor %}
+                        </div>
+                        </div>
                 </div>
 
-                <div class="grid grid-cols-1 gap-4">
-                    {% for item in recommendations %}
-                    <div class="glass-card p-6 md:p-8 rounded-3xl flex flex-col md:flex-row justify-between gap-6 hover:border-blue-500/50 group transition-all duration-300">
-                        <div class="flex-grow">
-                            <div class="flex items-start gap-4 mb-4">
-                                <div class="w-12 h-12 bg-slate-800 rounded-xl flex items-center justify-center text-xl font-bold text-slate-500">
-                                    {{ item.vacancy.employer.company_name|slice:":1" }}
-                                </div>
-                                <div>
-                                    <h3 class="text-xl font-bold text-white group-hover:text-blue-400 transition-colors">{{ item.vacancy.title }}</h3>
-                                    <p class="text-slate-400">{{ item.vacancy.employer.company_name }}</p>
-                                </div>
-                            </div>
-
-                            <div class="space-y-3">
-                                <div class="flex flex-wrap gap-2">
-                                    <span class="text-[10px] text-slate-500 uppercase font-bold tracking-tighter mr-2 py-1">Вы владеете:</span>
-                                    {% for skill in item.matched_skills %}
-                                        <span class="px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-lg text-xs font-medium">
-                                            {{ skill }}
-                                        </span>
-                                    {% endfor %}
-                                </div>
-                                
-                                {% if item.missing_skills %}
-                                <div class="flex flex-wrap gap-2">
-                                    <span class="text-[10px] text-slate-500 uppercase font-bold tracking-tighter mr-2 py-1">Нужно изучить:</span>
-                                    {% for skill in item.missing_skills %}
-                                        <span class="px-3 py-1 bg-red-500/10 text-red-400 border border-red-500/20 rounded-lg text-xs font-medium">
-                                            {{ skill }}
-                                        </span>
-                                    {% endfor %}
-                                </div>
-                                {% endif %}
-                            </div>
-                        </div>
-
-                        <div class="flex flex-col justify-between items-end min-w-[120px]">
-                            <div class="text-right">
-                                <div class="text-4xl font-black text-blue-500">{{ item.score }}%</div>
-                                <div class="text-[10px] text-slate-500 uppercase font-bold tracking-widest mt-1">Match Score</div>
-                            </div>
-                            <button class="px-6 py-2 bg-slate-800 hover:bg-white hover:text-black text-white text-sm font-bold rounded-xl transition-all">
-                                Подробнее
-                            </button>
-                        </div>
+                <div class="flex flex-col justify-between items-end min-w-[120px]">
+                    <div class="text-right">
+                        <div class="text-4xl font-black text-blue-500">{{ item.score }}%</div>
+                        <div class="text-[10px] text-slate-500 uppercase font-bold tracking-widest mt-1">Match Score</div>
                     </div>
-                    {% empty %}
-                    <div class="text-center py-20 bg-slate-900/30 rounded-3xl border border-slate-800">
-                        <p class="text-slate-500 italic text-lg">К сожалению, подходящих вакансий в базе пока нет.</p>
-                    </div>
-                    {% endfor %}
+                    <a href="#" class="px-6 py-2 bg-slate-800 hover:bg-white hover:text-black text-white text-sm font-bold rounded-xl transition-all">
+                        Подробнее
+                    </a>
                 </div>
             </div>
-        {% else %}
+            {% empty %}
+            <div class="text-center py-20 bg-slate-900/30 rounded-3xl border border-slate-800">
+                <p class="text-slate-500 italic text-lg">К сожалению, подходящих вакансий в базе пока нет.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}
             <div class="flex flex-col items-center justify-center py-20 opacity-30">
                 <svg class="w-20 h-20 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                 <p class="text-xl">Отправьте данные, чтобы запустить поиск</p>

@@ -1,44 +1,53 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .services import matcher
-from generator.models import Candidate
+from .models import AnalysisHistory  # ИСПРАВИЛИ ИМПОРТ
 
 def analyze_view(request):
     candidates = []
     error = None
 
     if request.method == "POST":
-        # 1. Проверка: Выбрал ли пользователь файл вообще
+        # ЛОГИКА СОХРАНЕНИЯ (срабатывает при нажатии кнопки "Сохранить")
+        if 'save_results' in request.POST:
+            candidate_ids = request.POST.getlist('cand_ids')
+            scores = request.POST.getlist('cand_scores')
+            v_title = request.POST.get('vacancy_name', 'Анализ')
+            v_text = request.POST.get('vacancy_text', 'Текст вакансии не указан')
+
+            for i in range(len(candidate_ids)):
+                c_id = candidate_ids[i]
+                # Создаем запись в твоей модели AnalysisHistory
+                AnalysisHistory.objects.create(
+                    employer=request.user, 
+                    candidate_name=request.POST.get(f'name_{c_id}'),
+                    vacancy_title=v_title,
+                    requirements_text=v_text,
+                    resume_text=request.POST.get(f'text_{c_id}', 'Текст резюме'),
+                    analysis_report=request.POST.get(f'conclusion_{c_id}', 'Без отчета'),
+                    market_fit_score=int(scores[i])
+                )
+            return redirect('/career/') # Уводим работодателя в личный кабинет
+
+        # ЛОГИКА АНАЛИЗА (твоя основная часть)
         files = request.FILES.getlist('resumes')
         use_gemini = request.POST.get('use_gemini') == 'on'
         
-        if not files:
-            error = "Файл не выбран! Дядя, прикрепи документ для анализа."
-        else:
-            # 2. Проверка: Есть ли кто-то в базе кандидатов
-            if not Candidate.objects.exists():
-                error = "База кандидатов пуста! Сначала нагенерируй челиков в генераторе."
+        if files:
+            vacancy_text = matcher.extract_text(files[0])
+            results = matcher.process_vacancy(vacancy_text, use_gemini=use_gemini)
+            if isinstance(results, list):
+                for c in results:
+                    c['status_color'] = "success" if c['score'] > 70 else "warning" if c['score'] > 40 else "danger"
+                    candidates.append(c)
+                # Передаем текст вакансии в контекст для скрытых полей
+                return render(request, 'recruitment/analyze.html', {
+                    'candidates': candidates, 
+                    'vacancy_text': vacancy_text,
+                    'vacancy_name': files[0].name
+                })
             else:
-                vacancy_file = files[0]
-                vacancy_text = matcher.extract_text(vacancy_file)
-                
-                # 3. Проверка: Удалось ли прочитать текст (не пустой ли файл)
-                if not vacancy_text or len(vacancy_text.strip()) < 10:
-                    error = "Не удалось прочитать текст. Файл пустой, поврежден или слишком короткий."
-                else:
-                    # Запускаем основной процесс
-                    results = matcher.process_vacancy(vacancy_text, use_gemini=use_gemini)
-                    
-                    if results == "NO_MATCHES" or not results:
-                        error = "🔍 Подходящих кандидатов не найдено. Попробуй другую вакансию или добавь новых людей."
-                    else:
-                        # Формируем список для вывода
-                        for c in results:
-                            score = int(c.get('score', 0))
-                            # Твои цвета из HTML
-                            c['status_color'] = "success" if score > 70 else "warning" if score > 40 else "danger"
-                            candidates.append(c)
+                error = "База пуста или совпадений нет."
+        else:
+            error = "Файл не выбран!"
 
-    return render(request, 'recruitment/analyze.html', {
-        'candidates': candidates, 
-        'error': error
-    })
+    return render(request, 'recruitment/analyze.html', {'candidates': candidates, 'error': error})

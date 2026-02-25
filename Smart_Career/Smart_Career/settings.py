@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'career',
     'recruitment',
     'matching',
+    'generator',
 ]
 
 MIDDLEWARE = [

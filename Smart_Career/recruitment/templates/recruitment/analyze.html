@@ -36,6 +36,9 @@
         .bg-danger-subtle { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid #ef4444; }
 
         .alert-custom { background: rgba(99, 102, 241, 0.05); border: 1px solid #334155; border-left: 5px solid #6366f1; border-radius: 16px; }
+        
+        .btn-save { background: linear-gradient(135deg, #10b981, #059669); border: none; transition: 0.3s transform; }
+        .btn-save:hover { transform: scale(1.02); color: white; }
     </style>
 </head>
 <body class="py-5">
@@ -139,11 +142,30 @@
                                 <h6 class="text-info fw-bold mb-2">💡 Вердикт системы:</h6>
                                 <p class="m-0 text-white small">{{ c.conclusion|safe }}</p>
                             </div>
-
                         </div>
                     </div>
                 </div>
                 {% endfor %}
+            </div>
+
+            <div class="text-center mt-5 mb-5">
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="vacancy_name" value="{{ vacancy_name }}">
+                    <input type="hidden" name="vacancy_text" value="{{ vacancy_text }}">
+                    
+                    {% for c in candidates %}
+                        <input type="hidden" name="cand_ids" value="{{ c.id }}">
+                        <input type="hidden" name="cand_scores" value="{{ c.score }}">
+                        <input type="hidden" name="name_{{ c.id }}" value="{{ c.name }}">
+                        <input type="hidden" name="text_{{ c.id }}" value="{{ c.text }}">
+                        <input type="hidden" name="conclusion_{{ c.id }}" value="{{ c.conclusion }}">
+                    {% endfor %}
+
+                    <button type="submit" name="save_results" class="btn btn-save btn-lg px-5 py-3 rounded-pill fw-bold shadow-lg text-white">
+                        💾 СОХРАНИТЬ РЕЗУЛЬТАТЫ В ИСТОРИЮ
+                    </button>
+                </form>
             </div>
         </div>
     </div>
@@ -151,7 +173,6 @@
 </div>
 
 <script>
-    // Обработка выбора файла
     const fileInput = document.getElementById('fileInput');
     const fileText = document.getElementById('fileText');
 
